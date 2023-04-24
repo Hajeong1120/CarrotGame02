@@ -33,7 +33,7 @@ gameFinishBanner.setClickListener(() => {
 const gameField = new Field(CARROT_COUNT, BUG_COUNT);
 gameField.setClickListener(onItemClick);
 
-function onItemClick(event) {
+function onItemClick(item) {
   if (!started) {
     return;
   }

@@ -23,20 +23,28 @@ export class GameBuilder {
     this.bugCount = num;
     return this;
   }
+
+  trashCount(num) {
+    this.trashCount = num;
+    return this;
+  }
+
   build() {
     return new Game(
       this.gameDuration, //
       this.carrotCount, //
-      this.bugCount
+      this.bugCount, //
+      this.trashCount
     );
   }
 }
 
 class Game {
-  constructor(gameDuration, carrotCount, bugCount) {
+  constructor(gameDuration, carrotCount, bugCount, trashCount) {
     this.gameDuration = gameDuration;
     this.carrotCount = carrotCount;
     this.bugCount = bugCount;
+    this.trashCount = trashCount;
 
     this.timerIndicator = document.querySelector(".game__timer");
     this.gameScore = document.querySelector(".game__score");
@@ -49,7 +57,7 @@ class Game {
       }
     });
 
-    this.gameField = new Field(carrotCount, bugCount);
+    this.gameField = new Field(carrotCount, bugCount, trashCount);
     this.gameField.setClickListener(this.onItemClick);
 
     this.started = false;

@@ -110,6 +110,7 @@ header {
 }
 
 .carrot:hover,
-.bug:hover {
+.bug:hover,
+.trash:hover {
   transform: scale(1.1);
 }

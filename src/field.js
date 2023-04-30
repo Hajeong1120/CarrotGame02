@@ -8,9 +8,10 @@ export const ItemType = Object.freeze({
 });
 
 export class Field {
-  constructor(carrotCount, bugCount) {
+  constructor(carrotCount, bugCount, trashCount) {
     this.carrotCount = carrotCount;
     this.bugCount = bugCount;
+    this.trashCount = trashCount;
     this.field = document.querySelector(".game__field");
     this.fieldRect = this.field.getBoundingClientRect();
     this.field.addEventListener("click", this.onClick);
@@ -19,6 +20,7 @@ export class Field {
     this.field.innerHTML = "";
     this._addItem("carrot", this.carrotCount, "img/carrot.png");
     this._addItem("bug", this.bugCount, "img/bug.png");
+    this._addItem("trash", this.trashCount, "img/trash.png");
   }
 
   setClickListener(onItemClick) {
@@ -49,7 +51,7 @@ export class Field {
       target.remove();
       sound.playCarrot();
       this.onItemClick && this.onItemClick(ItemType.carrot);
-    } else if (target.matches(".bug")) {
+    } else if (target.matches(".bug") || target.matches(".trash")) {
       this.onItemClick && this.onItemClick(ItemType.bug);
     }
   };

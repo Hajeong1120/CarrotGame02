@@ -1,7 +1,10 @@
 import { Field, ItemType } from "./field.js";
 import * as sound from "./sound.js";
 
+const MaxLevel = 5;
+
 export const Reason = Object.freeze({
+  nextLevel: "nextLevel",
   win: "win",
   lose: "lose",
   cancel: "cancel",
@@ -48,6 +51,7 @@ class Game {
 
     this.timerIndicator = document.querySelector(".game__timer");
     this.gameScore = document.querySelector(".game__score");
+    this.gameLevel = document.querySelector(".game__level");
     this.gameBtn = document.querySelector(".game__button");
     this.gameBtn.addEventListener("click", () => {
       if (this.started) {
@@ -63,6 +67,14 @@ class Game {
     this.started = false;
     this.score = 0;
     this.timer = undefined;
+
+    //레벨
+    this.level = 1;
+  }
+
+  //게임 승리 여부 받아오기
+  getGameStatus(status) {
+    this.status = status;
   }
 
   setGameStopListener(onGameStop) {
@@ -73,7 +85,7 @@ class Game {
     this.started = true;
     this.initGame();
     this.showStopButton();
-    this.showTimerAndScore();
+    this.showTimerAndScoreAndLevel();
     this.startGameTimer();
     sound.playBackground();
   }
@@ -94,13 +106,22 @@ class Game {
     if (item === ItemType.carrot) {
       this.score++;
       this.updateScoreBoard();
-      if (this.score === this.carrotCount) {
+      this.updateLevel();
+      if (this.score === this.carrotCount && this.level === MaxLevel) {
         this.stop(Reason.win);
+        console.log(this.level + "끝끝");
+      } else if (this.score === this.carrotCount && this.level < MaxLevel) {
+        this.stop(Reason.nextLevel);
+        console.log(this.level);
       }
     } else if (item === ItemType.bug) {
       this.stop(Reason.lose);
     }
   };
+
+  updateLevel() {
+    this.level++;
+  }
 
   showStopButton() {
     const icon = this.gameBtn.querySelector(".fas");
@@ -113,9 +134,10 @@ class Game {
     this.gameBtn.style.visibility = "hidden";
   }
 
-  showTimerAndScore() {
+  showTimerAndScoreAndLevel() {
     this.timerIndicator.style.visibility = "visible";
     this.gameScore.style.visibility = "visible";
+    this.gameLevel.style.visibility = "visible";
   }
 
   startGameTimer() {
@@ -145,6 +167,15 @@ class Game {
     this.score = 0;
     this.gameScore.innerText = this.carrotCount;
     this.gameField.init();
+
+    //게임 시작 시 레벨 초기화 여부
+    console.log(this.status);
+    if (this.status === Reason.nextLevel) {
+      this.level;
+    } else {
+      this.level = 1;
+    }
+    this.gameLevel.innerText = "LV." + this.level;
   }
 
   updateScoreBoard() {

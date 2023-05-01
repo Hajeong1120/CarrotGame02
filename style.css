@@ -55,12 +55,28 @@ header {
 }
 
 .game__score {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   width: 50px;
   height: 50px;
-  font-size: 30px;
+  font-size: 25px;
   margin-top: 4px;
   background-color: darksalmon;
+  color: white;
+  border-radius: 50%;
+  border: 3px solid black;
+}
+
+.game__level {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  margin-top: 4px;
+  background-color: rgb(88, 189, 145);
   color: white;
   border-radius: 50%;
   border: 3px solid black;

@@ -55,6 +55,12 @@ export class Field {
       this.onItemClick && this.onItemClick(ItemType.bug);
     }
   };
+
+  setItemsCount(carrot, bug, trash) {
+    this.carrotCount = carrot;
+    this.bugCount = bug;
+    this.trashCount = trash;
+  }
 }
 
 function randomNumber(min, max) {

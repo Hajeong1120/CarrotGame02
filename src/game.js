@@ -1,10 +1,11 @@
 import { Field, ItemType } from "./field.js";
 import * as sound from "./sound.js";
 
-const MaxLevel = 5;
+const MAX_LEVEL = 5;
+const INIT_LEVEL = 1;
 
 export const Reason = Object.freeze({
-  nextLevel: "nextLevel",
+  next: "next",
   win: "win",
   lose: "lose",
   cancel: "cancel",
@@ -14,21 +15,24 @@ export const Reason = Object.freeze({
 export class GameBuilder {
   gameDuration(duration) {
     this.gameDuration = duration;
+    this.INIT_DURATION = duration;
     return this;
   }
 
-  carrotCount(num) {
-    this.carrotCount = num;
+  carrotCount(carrot) {
+    this.carrotCount = carrot;
+    this.Init_Carrot = carrot;
     return this;
   }
 
-  bugCount(num) {
-    this.bugCount = num;
+  bugCount(bug) {
+    this.bugCount = bug;
+    this.Init_Bug = bug;
     return this;
   }
 
-  trashCount(num) {
-    this.trashCount = num;
+  trashCount(trash) {
+    this.trashCount = trash;
     return this;
   }
 
@@ -48,7 +52,6 @@ class Game {
     this.carrotCount = carrotCount;
     this.bugCount = bugCount;
     this.trashCount = trashCount;
-
     this.timerIndicator = document.querySelector(".game__timer");
     this.gameScore = document.querySelector(".game__score");
     this.gameLevel = document.querySelector(".game__level");
@@ -60,20 +63,15 @@ class Game {
         this.start();
       }
     });
-
     this.gameField = new Field(carrotCount, bugCount, trashCount);
     this.gameField.setClickListener(this.onItemClick);
-
     this.started = false;
     this.score = 0;
     this.timer = undefined;
-
-    //레벨
-    this.level = 1;
+    this.status = { start: "start" };
   }
 
-  //게임 승리 여부 받아오기
-  getGameStatus(status) {
+  setGameStatus(status) {
     this.status = status;
   }
 
@@ -102,26 +100,28 @@ class Game {
     if (!this.started) {
       return;
     }
-
     if (item === ItemType.carrot) {
       this.score++;
       this.updateScoreBoard();
-      this.updateLevel();
-      if (this.score === this.carrotCount && this.level === MaxLevel) {
+      if (this.score === this.carrotCount && this.level === MAX_LEVEL) {
         this.stop(Reason.win);
+        this.initGame(); //🙌🙌🙌 승리하면 승리 스토리로 넘어가도록 만들기
         console.log(this.level + "끝끝");
-      } else if (this.score === this.carrotCount && this.level < MaxLevel) {
-        this.stop(Reason.nextLevel);
+      } else if (this.score === this.carrotCount && this.level < MAX_LEVEL) {
+        this.stop(Reason.next);
+        this.level++;
+        this.nextLevel(this.level);
+        this.gameField.setItemsCount(
+          this.carrotCount,
+          this.bugCount,
+          this.trashCount
+        );
         console.log(this.level);
       }
     } else if (item === ItemType.bug) {
       this.stop(Reason.lose);
     }
   };
-
-  updateLevel() {
-    this.level++;
-  }
 
   showStopButton() {
     const icon = this.gameBtn.querySelector(".fas");
@@ -165,20 +165,77 @@ class Game {
 
   initGame() {
     this.score = 0;
-    this.gameScore.innerText = this.carrotCount;
-    this.gameField.init();
-
     //게임 시작 시 레벨 초기화 여부
     console.log(this.status);
-    if (this.status === Reason.nextLevel) {
+    if (this.status === Reason.next) {
       this.level;
     } else {
-      this.level = 1;
+      this.setInitItemCount(
+        this.gameDuration,
+        this.carrotCount,
+        this.bugCount,
+        this.trashCount
+      ); //🙌🙌🙌
     }
+    this.score = 0;
+    this.updateScoreBoard();
     this.gameLevel.innerText = "LV." + this.level;
+    this.gameScore.innerText = this.carrotCount;
+    this.gameField.init();
+  }
+
+  //모든 수치 초기화
+  setInitItemCount(gameDuration, carrotCount, bugCount, trashCount) {
+    this.level = INIT_LEVEL;
+    this.gameDuration = gameDuration;
+    this.carrotCount = carrotCount;
+    this.bugCount = bugCount;
+    this.trashCount = trashCount;
+    this.gameField.setItemsCount(
+      this.carrotCount,
+      this.bugCount,
+      this.trashCount
+    );
   }
 
   updateScoreBoard() {
     this.gameScore.innerText = this.carrotCount - this.score;
+  }
+
+  // Level Scailing
+  nextLevel(level) {
+    switch (level) {
+      case 1:
+        this.carrotCount = this.level;
+        this.bugCount = this.level;
+        this.trashCount = this.level;
+        break;
+      case 2:
+        this.gameDuration += 2;
+        this.carrotCount = 4;
+        this.bugCount = 3;
+        this.trashCount = 3;
+        break;
+      case 3:
+        this.gameDuration += 3;
+        this.carrotCount = 5;
+        this.bugCount = 4;
+        this.trashCount = 4;
+        break;
+      case 4:
+        this.gameDuration += 4;
+        this.carrotCount = 6;
+        this.bugCount = 5;
+        this.trashCount = 5;
+        break;
+      case 5:
+        this.gameDuration += 5;
+        this.carrotCount = 6;
+        this.bugCount = 6;
+        this.trashCount = 6;
+        break;
+      default:
+        throw new Error("not valid level");
+    }
   }
 }
